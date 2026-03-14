@@ -1,0 +1,6 @@
+node_modules/
+capture.js
+capture_screenshots.py
+package.json
+package-lock.json
+.vercel/
