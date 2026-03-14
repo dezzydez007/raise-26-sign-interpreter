@@ -1133,8 +1133,8 @@
             volume: 1
         };
 
-        // Wait for MediaPipe to load
-        function waitForMediaPipe(callback, retries = 50) {
+        // Wait for MediaPipe to load - faster timeout
+        function waitForMediaPipe(callback, retries = 10) {
             if (typeof Holistic !== 'undefined' && typeof Camera !== 'undefined') {
                 callback();
             } else if (retries > 0) {
@@ -1143,6 +1143,11 @@
                 console.error('MediaPipe failed to load');
                 document.getElementById('loading-status').textContent = 'Error loading ML models. Please refresh.';
             }
+        }
+        
+        // Preload MediaPipe in background
+        function preloadMediaPipe() {
+            document.getElementById('loading-status').textContent = 'Loading camera...';
         }
 
         // Calibration state
@@ -2116,10 +2121,9 @@
                 translationHistory = JSON.parse(saved);
             }
             
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-                showScreen('translate'); // Start with camera as main screen
-            }, 1500);
+            // Hide loading screen and start camera immediately
+            document.getElementById('loading-screen').classList.add('hidden');
+            showScreen('translate'); // Start with camera as main screen
         });
     </script>
 </body>
