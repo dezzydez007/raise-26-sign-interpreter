@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>AI Sign Language Calibration</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full max-w-md mx-auto flex-col bg-white dark:bg-slate-900 shadow-xl overflow-x-hidden">
+<!-- Header Section -->
+<div class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between border-b border-slate-100 dark:border-slate-800">
+<div class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-2xl">close</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Calibration</h2>
+<div class="size-12 flex items-center justify-end">
+<span class="material-symbols-outlined text-primary">help_outline</span>
+</div>
+</div>
+<!-- Progress Indicator -->
+<div class="px-6 py-6">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Overall Progress</span>
+<span class="text-xs font-bold text-primary">3 / 5 Signs</span>
+</div>
+<div class="flex w-full flex-row items-center justify-center gap-2 h-1.5">
+<div class="h-full flex-1 rounded-full bg-primary"></div>
+<div class="h-full flex-1 rounded-full bg-primary"></div>
+<div class="h-full flex-1 rounded-full bg-primary"></div>
+<div class="h-full flex-1 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-full flex-1 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col items-center px-6 pt-4">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-primary/20 group">
+<!-- Camera View Placeholder -->
+<div class="absolute inset-0 flex items-center justify-center">
+<img alt="Person performing sign language in front of camera" class="w-full h-full object-cover opacity-80" data-alt="Person performing sign language in front of camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMsGxuMomPRHXwPExDICygWRnjK-qBXv1c72nOnewQPQ-a4j9Dd84phi4sOBt5wDm1H9UkU3PYXcqem3W-jKNsXecm88VSXc7ZYp46rVMAL7RkJ7hpGcH1IacMBQi59m9gTxMFBTzLHbGL50lK98JML5VmM0-XtM4UQ3xkLzLhL0rcGFIdYJizT6hydqmUxpRtKDbvPZmhT8To5-ku8K9P3v-bmbGO-qywH8jCA48TKbdgoYWrVGpOVo4DhE_RQfqWIVXOOa2zksE"/>
+<!-- Detection Frame Overlay -->
+<div class="absolute inset-8 border-2 border-dashed border-white/50 rounded-lg pointer-events-none"></div>
+<!-- Success Feedback Overlay -->
+<div class="absolute inset-0 bg-primary/10 flex flex-col items-center justify-center transition-opacity">
+<div class="bg-primary text-white rounded-full p-4 shadow-lg scale-110">
+<span class="material-symbols-outlined text-5xl">check_circle</span>
+</div>
+<p class="mt-4 text-white font-bold text-xl drop-shadow-md">Sign Captured!</p>
+</div>
+</div>
+<!-- Timer / Recording Status -->
+<div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="size-2 bg-white rounded-full animate-pulse"></span>
+                    CALIBRATING
+                </div>
+</div>
+<div class="text-center mt-8 px-2">
+<h3 class="text-slate-900 dark:text-slate-100 tracking-tight text-2xl font-bold leading-tight pb-2">Perform the 'Thank You' sign</h3>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">
+                    Bring your dominant hand to your chin and move it forward. Hold for 2 seconds.
+                </p>
+</div>
+</div>
+<!-- Controls Section -->
+<div class="p-6 mt-auto">
+<div class="flex items-center justify-center gap-6 pb-8">
+<button class="flex shrink-0 items-center justify-center rounded-full size-12 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button class="flex shrink-0 items-center justify-center rounded-full size-20 bg-primary text-white shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-4xl">videocam</span>
+</button>
+<button class="flex shrink-0 items-center justify-center rounded-full size-12 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">flip_camera_ios</span>
+</button>
+</div>
+<!-- Hint/Next Card -->
+<div class="bg-primary/5 border border-primary/10 rounded-xl p-4 flex items-center gap-4">
+<div class="bg-primary/20 rounded-lg p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-primary">Calibration Tip</p>
+<p class="text-xs text-slate-600 dark:text-slate-400">Ensure your workspace is well-lit for better recognition.</p>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm">
+                    Next
+                </button>
+</div>
+</div>
+<!-- Safe Area Spacer -->
+<div class="h-6 bg-white dark:bg-slate-900"></div>
+</div>
+</body></html>
