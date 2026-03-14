@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1675469240/holistic.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1675469240/face_mesh.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -113,6 +114,13 @@
                         <span class="text-xs text-slate-400">Everyday phrases</span>
                     </div>
                 </button>
+                <button onclick="showScreen('face'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors group">
+                    <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">face</span>
+                    <div class="text-left">
+                        <span class="font-semibold block">Face & Pose</span>
+                        <span class="text-xs text-slate-400">Face/Body tracking</span>
+                    </div>
+                </button>
                 <button onclick="showScreen('calibrate'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors group">
                     <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">tune</span>
                     <div class="text-left">
@@ -190,6 +198,11 @@
                     <span class="font-bold">Translate</span>
                     <span class="text-xs opacity-80 mt-1">Real-time ASL</span>
                 </button>
+                <button onclick="showScreen('face')" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-4xl mb-2">face</span>
+                    <span class="font-bold">Face & Pose</span>
+                    <span class="text-xs opacity-80 mt-1">Body Tracking</span>
+                </button>
                 <button onclick="showScreen('learn')" class="flex flex-col items-center justify-center p-6 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     <span class="material-symbols-outlined text-4xl mb-2">school</span>
                     <span class="font-bold">Learn ASL</span>
@@ -204,6 +217,11 @@
                     <span class="material-symbols-outlined text-4xl mb-2">text_fields</span>
                     <span class="font-bold">Words</span>
                     <span class="text-xs text-slate-500 mt-1">Common phrases</span>
+                </button>
+                <button onclick="showScreen('calibrate')" class="flex flex-col items-center justify-center p-6 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <span class="material-symbols-outlined text-4xl mb-2">tune</span>
+                    <span class="font-bold">Calibrate</span>
+                    <span class="text-xs text-slate-500 mt-1">Improve Accuracy</span>
                 </button>
             </div>
 
@@ -271,6 +289,10 @@
                     <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
                         <span id="ml-status" class="w-2 h-2 rounded-full bg-green-500"></span>
                         <span class="text-xs text-white">ML Active</span>
+                    </div>
+                    <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                        <span id="face-status" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                        <span id="face-indicator" class="text-xs text-white">Face: --</span>
                     </div>
                     <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
                         <span id="motion-dot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
@@ -628,6 +650,24 @@
                                 <div class="absolute left-7 top-1 bg-white w-4 h-4 rounded-full transition-all duration-200"></div>
                             </button>
                         </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">face</span>
+                                <span class="font-semibold">Face Detection</span>
+                            </div>
+                            <button id="face-toggle" onclick="toggleFace()" class="w-12 h-6 bg-primary rounded-full relative">
+                                <div class="absolute left-7 top-1 bg-white w-4 h-4 rounded-full transition-all duration-200"></div>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">accessibility_new</span>
+                                <span class="font-semibold">Pose Detection</span>
+                            </div>
+                            <button id="pose-toggle" onclick="togglePose()" class="w-12 h-6 bg-primary rounded-full relative">
+                                <div class="absolute left-7 top-1 bg-white w-4 h-4 rounded-full transition-all duration-200"></div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -832,6 +872,62 @@
             </div>
         </div>
 
+        <!-- FACE DETECTION SCREEN -->
+        <div id="face-screen" class="hidden flex-col h-full">
+            <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
+                <button onclick="showScreen('home')" class="text-white p-2 hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-white text-lg font-bold">Face & Pose Detection</h1>
+                <button onclick="showContextHelp('face')" class="text-white p-2 hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">help_outline</span>
+                </button>
+            </div>
+
+            <div class="flex-1 camera-feed relative">
+                <video id="faceVideo" class="w-full h-full object-cover" autoplay playsinline></video>
+                <canvas id="faceCanvas" class="absolute inset-0 w-full h-full"></canvas>
+                
+                <div class="absolute top-16 left-4 flex flex-col gap-2">
+                    <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                        <span id="face-det-status" class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-white">Face Detection Active</span>
+                    </div>
+                    <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                        <span id="pose-det-status" class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-white">Pose Detection Active</span>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-40 left-4 bg-black/50 backdrop-blur-sm px-3 py-2 rounded-xl">
+                    <p class="text-xs text-white/70 mb-1">Detected</p>
+                    <p id="face-pose-info" class="text-sm text-white font-medium">--</p>
+                </div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 right-0 px-4 pb-4">
+                <div class="flex flex-col gap-4 rounded-xl border border-white/20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-5 shadow-2xl">
+                    <div class="flex items-center justify-between">
+                        <span class="text-primary text-xs font-bold uppercase">Detection Info</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-primary" id="face-points">0</p>
+                            <p class="text-xs text-slate-500">Face Points</p>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-primary" id="pose-points">0</p>
+                            <p class="text-xs text-slate-500">Pose Points</p>
+                        </div>
+                    </div>
+                    <button onclick="speakFaceInfo()" class="w-full flex items-center justify-center gap-2 rounded-lg h-12 bg-primary text-white font-bold">
+                        <span class="material-symbols-outlined">volume_up</span>
+                        <span>Speak Info</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ABOUT SCREEN -->
         <div id="about-screen" class="hidden flex-col h-full">
             <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
@@ -995,6 +1091,9 @@
             darkMode: false,
             showLandmarks: true,
             motionTracking: true,
+            handDetection: true,
+            faceDetection: true,
+            poseDetection: true,
             soundFeedback: false,
             vibrationFeedback: false,
             mlSensitivity: 0.5,
@@ -1056,6 +1155,10 @@
             voice: {
                 title: "Voice Settings",
                 content: "Customize how translations are spoken. Adjust speed, pitch, and volume to your preference."
+            },
+            face: {
+                title: "Face & Pose Detection",
+                content: "View real-time face mesh (468 points) and body pose detection (33 points). Useful for understanding body language and facial expressions in ASL."
             }
         };
 
@@ -1098,9 +1201,18 @@
                 screen.classList.add('flex');
             }
 
-            // Initialize screen-specific content
-            if (screenName === 'translate') startMLCamera();
-            else if (screenName === 'calibrate') startCalibrationCamera();
+            // Initialize screen-specific content - keep camera running for translate/calibrate
+            if (screenName === 'translate') {
+                startMLCamera();
+            }
+            else if (screenName === 'calibrate') {
+                if (!cameraActive) {
+                    startCalibrationCamera();
+                } else {
+                    // Use existing camera - just show landmarks on calibration canvas
+                    shareCameraToCalibration();
+                }
+            }
             else if (screenName === 'home') {
                 stopCamera();
                 updateStats();
@@ -1113,6 +1225,15 @@
             // Close menu if open
             document.getElementById('side-menu').classList.add('menu-slide');
             document.getElementById('side-menu').classList.remove('menu-open');
+        }
+
+        function shareCameraToCalibration() {
+            // Share the active camera feed to calibration screen
+            const calibVideo = document.getElementById('calibVideo');
+            const mainVideo = document.getElementById('inputVideo');
+            if (calibVideo && mainVideo && mainVideo.srcObject) {
+                calibVideo.srcObject = mainVideo.srcObject;
+            }
         }
 
         function updateStats() {
@@ -1270,6 +1391,21 @@
             saveSettings();
         }
 
+        function toggleHand() {
+            settings.handDetection = !settings.handDetection;
+            saveSettings();
+        }
+
+        function toggleFace() {
+            settings.faceDetection = !settings.faceDetection;
+            saveSettings();
+        }
+
+        function togglePose() {
+            settings.poseDetection = !settings.poseDetection;
+            saveSettings();
+        }
+
         function toggleSound() {
             settings.soundFeedback = !settings.soundFeedback;
             saveSettings();
@@ -1359,6 +1495,29 @@
 
                 const rightHand = results.rightHandLandmarks;
                 const leftHand = results.leftHandLandmarks;
+                const faceLandmarks = results.faceLandmarks;
+                const poseLandmarks = results.poseLandmarks;
+
+                // Draw face landmarks if enabled
+                if (settings.faceDetection && faceLandmarks && settings.showLandmarks) {
+                    drawFaceLandmarks(ctx, faceLandmarks);
+                }
+
+                // Draw pose landmarks if enabled
+                if (settings.poseDetection && poseLandmarks && settings.showLandmarks) {
+                    drawPoseLandmarks(ctx, poseLandmarks);
+                }
+
+                // Face detection status
+                if (faceLandmarks) {
+                    document.getElementById('face-status').classList.remove('bg-slate-400');
+                    document.getElementById('face-status').classList.add('bg-green-500');
+                    document.getElementById('face-indicator').textContent = 'Face: Detected';
+                } else {
+                    document.getElementById('face-status').classList.remove('bg-green-500');
+                    document.getElementById('face-status').classList.add('bg-slate-400');
+                    document.getElementById('face-indicator').textContent = 'Face: Not seen';
+                }
 
                 // Motion detection
                 const currentLandmarks = rightHand || leftHand;
@@ -1383,7 +1542,7 @@
                     }
                 }
 
-                if (rightHand || leftHand) {
+                if ((rightHand || leftHand) && settings.handDetection) {
                     const landmarks = currentLandmarks;
                     
                     if (settings.showLandmarks) {
@@ -1447,6 +1606,84 @@
                 totalMotion += Math.abs(curr[i].x - prev[i].x) + Math.abs(curr[i].y - prev[i].y);
             }
             return totalMotion / curr.length;
+        }
+
+        function drawFaceLandmarks(ctx, landmarks) {
+            if (!landmarks || landmarks.length < 468) return;
+            
+            const w = ctx.canvas.width;
+            const h = ctx.canvas.height;
+            
+            // Draw face mesh connections
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 0.5;
+            
+            // Draw key face points
+            ctx.fillStyle = '#00ff88';
+            const keyPoints = [1, 4, 10, 152, 397, 288, 323, 454, 356, 61, 40, 140, 171, 175, 396, 369, 395, 364, 365, 397, 288, 361, 323, 454];
+            
+            for (const idx of keyPoints) {
+                if (landmarks[idx]) {
+                    const x = landmarks[idx].x * w;
+                    const y = landmarks[idx].y * h;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+            
+            // Draw face oval
+            ctx.beginPath();
+            ctx.ellipse(
+                landmarks[1].x * w, 
+                landmarks[1].y * h, 
+                Math.abs(landmarks[234].x - landmarks[454].x) * w / 2,
+                Math.abs(landmarks[10].y - landmarks[152].y) * h / 2,
+                0, 0, 2 * Math.PI
+            );
+            ctx.stroke();
+        }
+
+        function drawPoseLandmarks(ctx, landmarks) {
+            if (!landmarks || landmarks.length < 33) return;
+            
+            const w = ctx.canvas.width;
+            const h = ctx.canvas.height;
+            
+            ctx.fillStyle = '#ff6b35';
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            
+            // Key pose points to draw
+            const poseConnections = [
+                [11, 12], // shoulders
+                [11, 13], [13, 15], // left arm
+                [12, 14], [14, 16], // right arm
+                [11, 23], [12, 24], // torso
+                [23, 24], // hips
+                [23, 25], [25, 27], // left leg
+                [24, 26], [26, 28], // right leg
+            ];
+            
+            // Draw connections
+            for (const [i, j] of poseConnections) {
+                if (landmarks[i] && landmarks[j]) {
+                    ctx.beginPath();
+                    ctx.moveTo(landmarks[i].x * w, landmarks[i].y * h);
+                    ctx.lineTo(landmarks[j].x * w, landmarks[j].y * h);
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw key joints
+            const keyJoints = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
+            for (const idx of keyJoints) {
+                if (landmarks[idx]) {
+                    ctx.beginPath();
+                    ctx.arc(landmarks[idx].x * w, landmarks[idx].y * h, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
         }
 
         function stopCamera() {
@@ -1710,6 +1947,101 @@
         function switchCamera() {
             showToast('Switching camera...');
         }
+
+        // Face Detection Screen Functions
+        let faceCameraActive = false;
+        let currentFaceInfo = "";
+        
+        function startFaceCamera() {
+            if (faceCameraActive) return;
+            
+            const video = document.getElementById('faceVideo');
+            const canvas = document.getElementById('faceCanvas');
+            if (!video || !canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            faceCameraActive = true;
+
+            holistic = new Holistic({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1675469240/${file}`
+            });
+
+            holistic.setOptions({
+                modelComplexity: 1,
+                smoothLandmarks: true,
+                enableFaceMesh: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            holistic.onResults((results) => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+                // Draw face landmarks
+                if (results.faceLandmarks) {
+                    drawFaceLandmarks(ctx, results.faceLandmarks);
+                    document.getElementById('face-points').textContent = results.faceLandmarks.length;
+                    currentFaceInfo = `Face detected with ${results.faceLandmarks.length} landmarks`;
+                } else {
+                    document.getElementById('face-points').textContent = '0';
+                }
+
+                // Draw pose landmarks
+                if (results.poseLandmarks) {
+                    drawPoseLandmarks(ctx, results.poseLandmarks);
+                    document.getElementById('pose-points').textContent = results.poseLandmarks.length;
+                    if (currentFaceInfo) {
+                        currentFaceInfo += `, Pose: ${results.poseLandmarks.length} points`;
+                    } else {
+                        currentFaceInfo = `Pose detected with ${results.poseLandmarks.length} points`;
+                    }
+                } else {
+                    document.getElementById('pose-points').textContent = '0';
+                }
+
+                // Update info display
+                document.getElementById('face-pose-info').textContent = currentFaceInfo || 'No detection';
+
+                ctx.restore();
+            });
+
+            const camera = new Camera(video, {
+                onFrame: async () => { await holistic.send({image: video}); },
+                width: 1280, height: 720
+            });
+            camera.start();
+        }
+
+        function stopFaceCamera() {
+            faceCameraActive = false;
+            const video = document.getElementById('faceVideo');
+            if (video && video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+            }
+        }
+
+        function speakFaceInfo() {
+            if (currentFaceInfo) {
+                speechSynthesis.speak(new SpeechSynthesisUtterance(currentFaceInfo));
+            } else {
+                speechSynthesis.speak(new SpeechSynthesisUtterance("No face or pose detected. Please position yourself in front of the camera."));
+            }
+        }
+
+        // Update showScreen to handle face screen
+        const originalShowScreen = showScreen;
+        showScreen = function(screenName) {
+            if (screenName === 'face') {
+                startFaceCamera();
+            } else if (screenName === 'home') {
+                stopFaceCamera();
+            }
+            originalShowScreen(screenName);
+        };
 
         // Initialize
         window.addEventListener('load', () => {
