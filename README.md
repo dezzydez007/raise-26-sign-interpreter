@@ -2,6 +2,37 @@
 
 **RAISE-26 Hackathon Project #1559029**
 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://sign-interpreter-five.vercel.app)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-blue)](https://github.com/dezzydez007/raise-26-sign-interpreter)
+
+---
+
+## Screenshots
+
+### 1. Home Screen
+![Home Screen](assets/screenshots/01_home.png)
+Features: Quick stats, recent translations, navigation menu access
+
+### 2. Learn ASL Screen
+![Learn ASL](assets/screenshots/02_learn.png)
+Features: Complete A-Z alphabet guide with finger position instructions
+
+### 3. Settings Screen
+![Settings](assets/screenshots/03_settings.png)
+Features: Dark mode, ML sensitivity, motion tracking, notifications
+
+### 4. Voice Settings Screen
+![Voice Settings](assets/screenshots/04_voice_settings.png)
+Features: Voice profile selection, speech speed, pitch control
+
+### 5. About Screen
+![About](assets/screenshots/05_about.png)
+Features: App information, features list, technology stack
+
+### 6. History Screen
+![History](assets/screenshots/06_history.png)
+Features: Translation history tracking
+
 ---
 
 ## 1. Problem Statement
@@ -20,8 +51,9 @@ Key problems include:
 
 Our **Real-Time Sign Language Interpreter** is an AI-powered device that:
 - Captures video input via webcam
-- Uses computer vision (MediaPipe) to detect and track hand landmarks
-- Employs machine learning to classify gestures into letters (A-Z) and common phrases
+- Uses computer vision (MediaPipe Holistic) to detect and track hand landmarks
+- Employs motion detection ML to improve gesture recognition
+- Classifies gestures into letters (A-Z) and common phrases
 - Outputs translations as both **text** (on-screen) and **spoken audio** (text-to-speech)
 - Works in real-time with minimal latency
 
@@ -32,67 +64,84 @@ This solution bridges communication gaps by providing instant, automatic transla
 ## 3. Technical Implementation
 
 ### Architecture
-
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Webcam Input   │───>│ MediaPipe Hands  │───>│ ML Classifier   │
-│   (OpenCV)      │    │ (21 landmarks)   │    │ (Random Forest) │
+│  Webcam Input   │───>│ MediaPipe        │───>│ Motion Detection│
+│                 │    │ Holistic          │    │ & Gesture ML    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                                                       │
                                                       v
                         ┌──────────────────┐    ┌─────────────────┐
                         │   Text Display   │<───│ Text-to-Speech  │
-                        │   (OpenCV)       │    │   (pyttsx3)     │
+                        │   (Browser)      │    │   (Web Speech)  │
                         └──────────────────┘    └─────────────────┘
 ```
 
 ### Key Components
 
-1. **Hand Detection (MediaPipe)**
-   - Detects 21 hand landmarks per frame
-   - Supports multi-hand tracking
-   - 3D coordinates (x, y, z) for depth awareness
-   - 70% detection confidence threshold
-
-2. **Gesture Classification**
-   - Random Forest classifier trained on landmark data
-   - Supports: A-Z alphabet, common phrases (Hello, Thank You, Yes, No, etc.)
-   - Rule-based fallback for immediate use without training
-
-3. **Output System**
-   - Real-time text overlay on video
-   - Text-to-speech audio output
-   - Configurable speech rate
-
-4. **User Interface**
-   - Toggle landmarks visualization
-   - Pause/resume functionality
-   - Clear text buffer
-   - Manual speech trigger
+1. **MediaPipe Holistic** - Full body/hand pose detection
+2. **Motion Tracking** - Calculates velocity between frames
+3. **Finger Detection** - Uses PIP joint positions for accuracy
+4. **Consistency Filtering** - Requires 3+ consistent predictions
+5. **Both Hands** - Supports detection for left and right hands
 
 ### Technologies Used
-- **Python** (as required by RAISE-26)
-- **OpenCV** - Video capture and rendering
-- **MediaPipe** - Hand landmark detection
-- **scikit-learn** - ML classification
-- **pyttsx3** - Text-to-speech
+- **MediaPipe Holistic** - Hand landmark detection
+- **TensorFlow.js** - ML processing in browser
+- **Tailwind CSS** - UI styling
+- **Vercel** - Deployment
 
 ---
 
-## 4. Impact
+## 4. Features
 
-### Social Impact
-- **Accessibility**: Enables deaf/hard-of-hearing individuals to communicate with hearing people in real-time
-- **Independence**: Reduces reliance on human interpreters for everyday conversations
-- **Education**: Can be used in classrooms to include deaf students
-- **Healthcare**: Improves patient-doctor communication in medical settings
+| Feature | Description |
+|---------|-------------|
+| Real-time Detection | Live ASL gesture recognition |
+| Motion Tracking | Detects hand movement patterns |
+| Text-to-Speech | Voice output of translations |
+| ASL Alphabet | Complete A-Z guide |
+| Translation History | Save and review past translations |
+| Calibration | Improve accuracy with training |
+| Dark Mode | Support for dark theme |
+| Voice Settings | Customize speech output |
 
-### Economic Impact
-- Reduces cost of professional sign language interpreters
-- Enables businesses to better serve deaf customers
-- Creates job opportunities in accessibility technology
+---
 
-### Future Enhancements
+## 5. How to Run
+
+### Live Demo
+Visit: https://sign-interpreter-five.vercel.app
+
+### Local Development
+```bash
+# Clone the repository
+git clone https://github.com/dezzydez007/raise-26-sign-interpreter.git
+
+# Open index.html in a browser
+# Or serve with a local server
+npx serve
+```
+
+---
+
+## 6. Project Structure
+
+```
+├── index.html          # Main application (single-page app)
+├── assets/
+│   └── screenshots/   # App screenshots
+├── UI/                # Original UI templates
+├── asl_gesture_database.json  # ASL gesture reference data
+├── requirements.txt   # Python dependencies
+├── README.md         # This file
+└── vercel.json       # Vercel deployment config
+```
+
+---
+
+## 7. Future Enhancements
+
 - Deep learning models for better accuracy
 - Support for multiple sign languages (ASL, BSL, etc.)
 - Mobile app deployment
@@ -101,45 +150,9 @@ This solution bridges communication gaps by providing instant, automatic transla
 
 ---
 
-## 5. How to Run
+## License
 
-### Installation
-```bash
-pip install -r requirements.txt
-```
-
-### Run the Interpreter
-```bash
-python sign_interpreter.py
-```
-
-### Collect Training Data
-```bash
-python sign_interpreter.py collect
-```
-
-### Train Custom Model
-```bash
-python sign_interpreter.py train
-```
-
-### Controls
-- **SPACE**: Pause/Resume
-- **L**: Toggle landmarks visualization
-- **C**: Clear text
-- **S**: Speak current text
-- **Q**: Quit
-
----
-
-## 6. Presentation
-
-This project can be presented with:
-1. Live demo of real-time sign language translation
-2. Comparison with existing solutions
-3. Technical deep-dive on the ML pipeline
-4. Discussion of ablation experiments (removing components to prove value)
-5. Future roadmap for SOTA improvements
+MIT License - RAISE-26 Hackathon Project
 
 ---
 
