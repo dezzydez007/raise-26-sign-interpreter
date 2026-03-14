@@ -1133,6 +1133,18 @@
             volume: 1
         };
 
+        // Wait for MediaPipe to load
+        function waitForMediaPipe(callback, retries = 50) {
+            if (typeof Holistic !== 'undefined' && typeof Camera !== 'undefined') {
+                callback();
+            } else if (retries > 0) {
+                setTimeout(() => waitForMediaPipe(callback, retries - 1), 100);
+            } else {
+                console.error('MediaPipe failed to load');
+                document.getElementById('loading-status').textContent = 'Error loading ML models. Please refresh.';
+            }
+        }
+
         // Calibration state
         let calibrationStep = 0;
         const calibrationLetters = ['A', 'B', 'C', 'D', 'E'];
@@ -1488,6 +1500,13 @@
         
         function startMLCamera() {
             if (cameraActive) return;
+            
+            waitForMediaPipe(function() {
+                initMLCamera();
+            });
+        }
+
+        function initMLCamera() {
             
             const video = document.getElementById('inputVideo');
             const canvas = document.getElementById('outputCanvas');
@@ -1889,6 +1908,12 @@
             calibrationStep = 0;
             updateCalibrationUI();
             
+            waitForMediaPipe(function() {
+                initCalibrationCamera();
+            });
+        }
+
+        function initCalibrationCamera() {
             const video = document.getElementById('calibVideo');
             const canvas = document.getElementById('calibCanvas');
             if (!video || !canvas) return;
@@ -1926,6 +1951,7 @@
                 width: 640, height: 480
             });
             camera.start();
+            });
         }
 
         function updateCalibrationUI() {
@@ -1985,6 +2011,12 @@
         function startFaceCamera() {
             if (faceCameraActive) return;
             
+            waitForMediaPipe(function() {
+                initFaceCamera();
+            });
+        }
+
+        function initFaceCamera() {
             const video = document.getElementById('faceVideo');
             const canvas = document.getElementById('faceCanvas');
             if (!video || !canvas) return;
@@ -2044,6 +2076,7 @@
                 width: 1280, height: 720
             });
             camera.start();
+            });
         }
 
         function stopFaceCamera() {
