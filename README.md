@@ -7,166 +7,103 @@
 
 ---
 
-## Screenshots
+## Main Screen
 
-### 1. Home Screen
-![Home Screen](assets/screenshots/01_home.png)
-Dashboard with translation stats, quick access buttons to Translate, Face & Pose, Learn ASL, Numbers, Words, and Calibrate features.
+![Sign Interpreter](assets/screenshots/main_screen.png)
 
-### 2. Translate Screen
-![Translate](assets/screenshots/02_translate.png)
-Real-time ASL detection with live camera feed, motion tracking indicator, confidence display, and Speak/Copy controls.
+The app opens directly to a full-screen camera view - the primary translation interface. Position your hand in the frame to detect ASL gestures in real-time.
 
-### 3. Learn ASL Screen
-![Learn ASL](assets/screenshots/03_learn.png)
-Complete A-Z alphabet guide with difficulty filters (Easy/Medium/Hard) and detailed instructions for each letter.
+### Features on Main Screen:
+- **Full-screen camera** - Real-time webcam feed with hand landmark detection
+- **Quick navigation** - Right-side buttons for Learn, Numbers, Words, Face, History, Calibrate
+- **ML status indicator** - Shows when AI detection is active
+- **Motion tracking** - Detects hand movement patterns
+- **Face detection** - Shows face detection status
+- **Confidence meter** - Displays gesture recognition confidence
+- **Live translation** - Shows detected letters/numbers in real-time
+- **Speak button** - Text-to-speech output
+- **Copy button** - Copy translation to clipboard
 
-### 4. Numbers Screen
-![Numbers](assets/screenshots/04_numbers.png)
-ASL numbers 0-10 with visual demonstrations and finger position descriptions.
-
-### 5. Common Words Screen
-![Words](assets/screenshots/05_words.png)
-Essential ASL phrases organized by category: Greetings, Questions, and Everyday expressions.
-
-### 6. Face & Pose Detection Screen
-![Face](assets/screenshots/06_face.png)
-Real-time face mesh (468 points) and body pose detection (33 points) for enhanced gesture recognition.
-
-### 7. History Screen
-![History](assets/screenshots/07_history.png)
-Translation history with export functionality and speaker buttons for each entry.
-
-### 8. Settings Screen
-![Settings](assets/screenshots/08_settings.png)
-Full settings panel with toggles for Dark Mode, Landmarks, Motion Tracking, Hand/Face/Pose Detection, Sound & Vibration feedback.
-
-### 9. Voice Settings Screen
-![Voice](assets/screenshots/09_voice.png)
-Voice profile selection (Male/Female/Neutral), speech speed, pitch, and volume controls with test functionality.
-
-### 10. About Screen
-![About](assets/screenshots/10_about.png)
-App information, features list, technology stack, and tips for best results.
+### Navigation:
+- **Menu button** (top-left) - Opens side menu with all screens
+- **Home button** (top-right) - Go to dashboard
+- **Settings button** (top-right) - Voice settings
 
 ---
 
-## 1. Problem Statement
+## All Screens
 
-Communication barriers persist between the deaf/hard-of-hearing community and hearing individuals. Approximately 430 million people worldwide have disabling hearing loss, and this number is projected to increase to over 700 million by 2050. 
-
-Key problems include:
-- **Lack of real-time translation**: Existing solutions have significant delays
-- **Accessibility gaps**: Many public services, healthcare facilities, and educational institutions lack adequate sign language interpretation
-- **Dependency on human interpreters**: Cost-prohibitive and not always available
-- **Limited vocabulary support**: Most apps only recognize fingerspelling (A-Z) rather than full words and phrases
-
----
-
-## 2. Solution
-
-Our **Real-Time Sign Language Interpreter** is an AI-powered device that:
-- Captures video input via webcam
-- Uses computer vision (MediaPipe Holistic) to detect and track hand landmarks
-- Employs motion detection ML to improve gesture recognition
-- Classifies gestures into letters (A-Z), numbers (0-10), and common phrases
-- Outputs translations as both **text** (on-screen) and **spoken audio** (text-to-speech)
-- Provides face mesh and pose detection for enhanced understanding
+| Screen | Access | Description |
+|--------|--------|-------------|
+| **Translate** | Main | Real-time ASL detection with camera |
+| **Learn ASL** | Side menu / Quick buttons | A-Z alphabet with difficulty filters |
+| **Numbers** | Side menu / Quick buttons | ASL numbers 0-10 |
+| **Words** | Side menu / Quick buttons | Common phrases (Greetings, Questions, Everyday) |
+| **Face & Pose** | Side menu / Quick buttons | 468-point face mesh + 33-point body pose |
+| **History** | Side menu / Quick buttons | Translation log with export |
+| **Calibrate** | Side menu / Quick buttons | Improve accuracy with training |
+| **Settings** | Side menu | Dark mode, ML sensitivity, detection toggles |
+| **Voice Settings** | From translate | Voice profile, speed, pitch, volume |
+| **About** | Side menu | App info, features, technology |
 
 ---
 
-## 3. Technical Implementation
+## Problem
 
-### Architecture
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Webcam Input   │───>│ MediaPipe        │───>│ Motion Detection│
-│                 │    │ Holistic         │    │ & Gesture ML    │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                                      │
-                                                      v
-                         ┌──────────────────┐    ┌─────────────────┐
-                         │   Text Display   │<───│ Text-to-Speech  │
-                         │   (Browser)      │    │   (Web Speech)  │
-                         └──────────────────┘    └─────────────────┘
-```
-
-### Key Components
-
-1. **MediaPipe Holistic** - Full body, face, and hand pose detection
-2. **Motion Tracking** - Calculates velocity between frames for dynamic gestures
-3. **Finger Detection** - Uses PIP joint positions for accuracy
-4. **Consistency Filtering** - Requires 3+ consistent predictions
-5. **Both Hands** - Supports detection for left and right hands
-6. **Face Mesh** - 468 facial landmarks for expression detection
-7. **Pose Detection** - 33 body keypoints for signing posture
-
-### Technologies Used
-- **MediaPipe Holistic** - Hand, face, and pose landmark detection
-- **TensorFlow.js** - ML processing in browser
-- **Tailwind CSS** - UI styling
-- **Vercel** - Deployment
+430 million people worldwide have disabling hearing loss. Key barriers include:
+- Lack of real-time translation
+- Limited accessibility in public services
+- Dependency on human interpreters
+- Most apps only recognize fingerspelling
 
 ---
 
-## 4. Features
+## Solution
+
+AI-powered real-time ASL interpreter using:
+- **MediaPipe Holistic** - Hand, face, and pose detection
+- **Motion tracking** - Velocity calculation between frames
+- **Text-to-speech** - Voice output via Web Speech API
+- **Browser-based** - No installation required
+
+---
+
+## Features
 
 | Feature | Description |
 |---------|-------------|
 | Real-time Detection | Live ASL gesture recognition |
-| Motion Tracking | Detects hand movement patterns |
-| Face Detection | 468-point face mesh |
-| Pose Detection | 33-point body pose tracking |
-| Text-to-Speech | Voice output of translations |
-| ASL Alphabet | Complete A-Z guide with tutorials |
+| Motion Tracking | Detects hand movement |
+| Face Mesh | 468 facial landmarks |
+| Pose Detection | 33 body keypoints |
+| Text-to-Speech | Voice output |
+| ASL Alphabet | A-Z guide with tutorials |
 | Numbers 0-10 | ASL number gestures |
-| Common Words | Essential phrases by category |
-| Translation History | Save and review translations |
-| Calibration | Improve accuracy with training |
-| Dark Mode | Support for dark theme |
-| Voice Settings | Customize speech output |
+| Common Words | Essential phrases |
+| Translation History | Save and export |
+| Calibration | Accuracy training |
+| Dark Mode | Dark theme support |
+| Voice Settings | Customize speech |
 
 ---
 
-## 5. How to Run
+## How to Use
 
-### Live Demo
-Visit: https://sign-interpreter-five.vercel.app
-
-### Local Development
-```bash
-# Clone the repository
-git clone https://github.com/dezzydez007/raise-26-sign-interpreter.git
-
-# Open index.html in a browser
-# Or serve with a local server
-npx serve
-```
+1. Visit: https://sign-interpreter-five.vercel.app
+2. Allow camera access
+3. Position hand in frame
+4. Make ASL signs - app detects in real-time
+5. Tap "Speak" to hear translation
+6. Use quick buttons to access Learn, Numbers, Words
 
 ---
 
-## 6. Project Structure
+## Technology
 
-```
-├── index.html          # Main application (single-page app)
-├── assets/
-│   └── screenshots/   # App screenshots (10 screens)
-├── UI/                # Original UI templates
-├── asl_gesture_database.json  # ASL gesture reference data
-├── requirements.txt   # Python dependencies
-├── README.md         # This file
-└── vercel.json       # Vercel deployment config
-```
-
----
-
-## 7. Future Enhancements
-
-- Deep learning models for better accuracy
-- Support for multiple sign languages (ASL, BSL, etc.)
-- Mobile app deployment
-- Integration with video conferencing platforms
-- Continuous learning from user input
+- MediaPipe Holistic
+- TensorFlow.js
+- Tailwind CSS
+- Vercel Deployment
 
 ---
 
@@ -176,4 +113,4 @@ MIT License - RAISE-26 Hackathon Project
 
 ---
 
-*Submitted for RAISE-26 Hackathon | Project #1559029*
+*RAISE-26 Hackathon | Project #1559029*

@@ -264,21 +264,23 @@
             </div>
         </div>
 
-        <!-- TRANSLATE SCREEN -->
+        <!-- TRANSLATE SCREEN (Main Menu - Full Screen Camera) -->
         <div id="translate-screen" class="hidden flex-col h-full">
             <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
-                <button onclick="showScreen('home')" class="text-white p-2 hover:bg-white/10 rounded-full">
-                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                <button onclick="toggleMenu()" class="text-white p-2 hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
                 <div class="flex items-center gap-2">
-                    <span class="text-white font-semibold">Sign Translator</span>
-                    <button onclick="showContextHelp('translate')" class="text-white/70 hover:text-white p-1">
-                        <span class="material-symbols-outlined text-lg">help_outline</span>
+                    <span class="text-white font-semibold">Sign Interpreter</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="showScreen('home')" class="text-white p-2 hover:bg-white/10 rounded-full" title="Home">
+                        <span class="material-symbols-outlined text-2xl">home</span>
+                    </button>
+                    <button onclick="showScreen('voice-settings')" class="text-white p-2 hover:bg-white/10 rounded-full" title="Settings">
+                        <span class="material-symbols-outlined text-2xl">settings</span>
                     </button>
                 </div>
-                <button onclick="showScreen('voice-settings')" class="text-white p-2 hover:bg-white/10 rounded-full">
-                    <span class="material-symbols-outlined text-2xl">settings</span>
-                </button>
             </div>
 
             <div class="flex-1 camera-feed relative">
@@ -313,6 +315,34 @@
                         </div>
                         <p id="confidence-value" class="text-xs text-white text-right mt-1">--%</p>
                     </div>
+                </div>
+
+                <!-- Quick Navigation Buttons -->
+                <div class="absolute right-4 top-48 flex flex-col gap-3">
+                    <button onclick="showScreen('learn')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="Learn ASL">
+                        <span class="material-symbols-outlined text-xl">school</span>
+                        <span class="text-[10px]">Learn</span>
+                    </button>
+                    <button onclick="showScreen('numbers')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="Numbers">
+                        <span class="material-symbols-outlined text-xl">pin</span>
+                        <span class="text-[10px]">Numbers</span>
+                    </button>
+                    <button onclick="showScreen('words')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="Words">
+                        <span class="material-symbols-outlined text-xl">text_fields</span>
+                        <span class="text-[10px]">Words</span>
+                    </button>
+                    <button onclick="showScreen('face')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="Face & Pose">
+                        <span class="material-symbols-outlined text-xl">face</span>
+                        <span class="text-[10px]">Face</span>
+                    </button>
+                    <button onclick="showScreen('history')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="History">
+                        <span class="material-symbols-outlined text-xl">history</span>
+                        <span class="text-[10px]">History</span>
+                    </button>
+                    <button onclick="showScreen('calibrate')" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-black/50 backdrop-blur-sm text-white border border-white/20 hover:bg-black/70 transition-all" title="Calibrate">
+                        <span class="material-symbols-outlined text-xl">tune</span>
+                        <span class="text-[10px]">Calibrate</span>
+                    </button>
                 </div>
 
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -2043,7 +2073,7 @@
             originalShowScreen(screenName);
         };
 
-        // Initialize
+        // Initialize - start with camera screen as main menu
         window.addEventListener('load', () => {
             loadSettings();
             
@@ -2055,7 +2085,7 @@
             
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
-                showScreen('home');
+                showScreen('translate'); // Start with camera as main screen
             }, 1500);
         });
     </script>
