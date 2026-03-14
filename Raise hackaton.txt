@@ -1,0 +1,21 @@
+
+You are participating in a hackathon called RAISE-26.
+You need to build a project that uses AI to solve a problem.
+Real-Time Sign Language Interpreter #1559029
+You will be evaluated on the following criteria:
+
+1. Problem Statement: Clearly articulate the problem you are trying to solve.
+2. Solution: Describe your solution and how it addresses the problem.
+3. Technical Implementation: Explain the technical details of your solution.
+4. Impact: Discuss the potential impact of your solution.
+5. Presentation: Prepare a presentation to showcase your solution.
+
+A device that uses AI to interpret sign language in real time and translates it into spoken word and text. This tool aims to bridge communication gaps for the deaf and hard of hearing community.
+
+**Use Required Tools:** Ensure your final submission is in **Python (Colab or Jupyter Notebooks)** or **R**, as these are the only approved languages unless you get prior organizer approval\[1\].
+
+ Strategic Research**
+
+**Ablation Experiments:** If you use multiple Gemini-driven modules, perform an "ablation experiment"—remove one component at a time to prove to the judges that every part of your AI pipeline is actually adding value\[8\].
+
+**State-of-the-Art (SOTA):** Aim to push the boundaries of what is current. If there is previous work on your specific task, try to replicate and then improve upon it using Gemini's advanced capabilities\[6\].
