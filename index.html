@@ -9,8 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose@0.0.4/dist/handpose.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script>
@@ -33,9 +31,10 @@
         .camera-feed { background: #1a1a2e; }
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
         .dark .glass-panel { background: rgba(15, 23, 42, 0.95); }
-        .motion-trail { position: absolute; pointer-events: none; }
         @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(19, 91, 236, 0.5); } 50% { box-shadow: 0 0 25px rgba(19, 91, 236, 0.8); } }
         .detecting { animation: pulse-glow 1.5s infinite; }
+        .menu-slide { transform: translateX(-100%); }
+        .menu-open { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display min-h-screen">
@@ -48,38 +47,114 @@
                 <div class="absolute inset-0 w-24 h-24 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
             </div>
             <h2 class="mt-6 text-xl font-bold text-slate-800 dark:text-white">Loading ML Models...</h2>
-            <p id="loading-status" class="mt-2 text-sm text-slate-500">Initializing hand detection...</p>
-            <div class="mt-4 w-48 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div id="loading-progress" class="h-full bg-primary transition-all duration-500" style="width: 0%"></div>
+            <p id="loading-status" class="mt-2 text-sm text-slate-500">Initializing...</p>
+        </div>
+
+        <!-- Side Menu -->
+        <div id="side-menu" class="menu-slide fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-xl transition-transform duration-300 flex flex-col">
+            <div class="flex items-center justify-between p-6 border-b border-slate-700">
+                <h2 class="text-2xl font-bold text-white">Menu</h2>
+                <button onclick="toggleMenu()" class="text-white p-2 hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="showScreen('home'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">home</span>
+                    <span class="font-semibold">Home</span>
+                </button>
+                <button onclick="showScreen('translate'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">translate</span>
+                    <span class="font-semibold">Translate</span>
+                </button>
+                <button onclick="showScreen('learn'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">school</span>
+                    <span class="font-semibold">Learn ASL</span>
+                </button>
+                <button onclick="showScreen('calibrate'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">tune</span>
+                    <span class="font-semibold">Calibration</span>
+                </button>
+                <button onclick="showScreen('history'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">history</span>
+                    <span class="font-semibold">History</span>
+                </button>
+                <button onclick="showScreen('voice-settings'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">record_voice_over</span>
+                    <span class="font-semibold">Voice Settings</span>
+                </button>
+                <button onclick="showScreen('about'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">info</span>
+                    <span class="font-semibold">About</span>
+                </button>
+            </div>
+            <div class="p-4 border-t border-slate-700">
+                <button onclick="showScreen('settings'); toggleMenu()" class="w-full flex items-center gap-4 p-4 text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-2xl">settings</span>
+                    <span class="font-semibold">Settings</span>
+                </button>
             </div>
         </div>
 
         <!-- HOME SCREEN -->
         <div id="home-screen" class="hidden flex-col h-full">
             <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-                <button onclick="showScreen('menu')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                <button onclick="toggleMenu()" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                     <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
                 <h1 class="text-slate-900 dark:text-white text-lg font-bold">Sign Translator</h1>
-                <button onclick="toggleDarkMode()" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
-                    <span class="material-symbols-outlined text-2xl" id="theme-icon">dark_mode</span>
+                <button onclick="showScreen('settings')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">settings</span>
                 </button>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="p-4 grid grid-cols-3 gap-3">
+                <div class="bg-gradient-to-br from-primary to-blue-600 p-4 rounded-xl text-white">
+                    <span class="material-symbols-outlined text-2xl">translate</span>
+                    <p class="text-2xl font-bold mt-1" id="stat-translations">0</p>
+                    <p class="text-xs opacity-80">Translations</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl text-white">
+                    <span class="material-symbols-outlined text-2xl">timer</span>
+                    <p class="text-2xl font-bold mt-1" id="stat-time">0m</p>
+                    <p class="text-xs opacity-80">Session Time</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-xl text-white">
+                    <span class="material-symbols-outlined text-2xl">emoji_events</span>
+                    <p class="text-2xl font-bold mt-1">85%</p>
+                    <p class="text-xs opacity-80">Accuracy</p>
+                </div>
             </div>
 
             <div class="p-4 grid grid-cols-2 gap-3">
                 <button onclick="showScreen('translate')" class="flex flex-col items-center justify-center p-6 bg-primary text-white rounded-xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
                     <span class="material-symbols-outlined text-4xl mb-2">translate</span>
                     <span class="font-bold">Translate</span>
+                    <span class="text-xs opacity-80 mt-1">Real-time ASL</span>
+                </button>
+                <button onclick="showScreen('learn')" class="flex flex-col items-center justify-center p-6 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <span class="material-symbols-outlined text-4xl mb-2">school</span>
+                    <span class="font-bold">Learn ASL</span>
+                    <span class="text-xs text-slate-500 mt-1">A-Z Guide</span>
                 </button>
                 <button onclick="showScreen('calibrate')" class="flex flex-col items-center justify-center p-6 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined text-4xl mb-2">tune</span>
                     <span class="font-bold">Calibrate</span>
+                    <span class="text-xs text-slate-500 mt-1">Improve Accuracy</span>
+                </button>
+                <button onclick="showScreen('history')" class="flex flex-col items-center justify-center p-6 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <span class="material-symbols-outlined text-4xl mb-2">history</span>
+                    <span class="font-bold">History</span>
+                    <span class="text-xs text-slate-500 mt-1">Past Translations</span>
                 </button>
             </div>
 
             <div class="flex-1 px-4 overflow-y-auto">
                 <h2 class="text-slate-900 dark:text-white text-lg font-bold mb-3">Recent Translations</h2>
-                <div id="translation-history" class="space-y-3"></div>
+                <div id="translation-history" class="space-y-3">
+                    <p class="text-slate-500 text-sm text-center py-4">No translations yet</p>
+                </div>
             </div>
 
             <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-6 pt-3">
@@ -87,9 +162,9 @@
                     <span class="material-symbols-outlined text-[28px] fill-1">home</span>
                     <p class="text-xs font-medium">Home</p>
                 </button>
-                <button onclick="showScreen('history')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
-                    <span class="material-symbols-outlined text-[28px]">history</span>
-                    <p class="text-xs font-medium">History</p>
+                <button onclick="showScreen('translate')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">translate</span>
+                    <p class="text-xs font-medium">Translate</p>
                 </button>
                 <button onclick="showScreen('learn')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
                     <span class="material-symbols-outlined text-[28px]">school</span>
@@ -102,7 +177,7 @@
             </div>
         </div>
 
-        <!-- TRANSLATION SCREEN -->
+        <!-- TRANSLATE SCREEN -->
         <div id="translate-screen" class="hidden flex-col h-full">
             <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
                 <button onclick="showScreen('home')" class="text-white p-2 hover:bg-white/10 rounded-full">
@@ -118,15 +193,14 @@
                 <video id="inputVideo" class="w-full h-full object-cover" autoplay playsinline></video>
                 <canvas id="outputCanvas" class="absolute inset-0 w-full h-full"></canvas>
                 
-                <!-- ML Status -->
                 <div class="absolute top-16 left-4 flex flex-col gap-2">
-                    <div id="ml-status" class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                    <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-green-500"></span>
                         <span class="text-xs text-white">ML Active</span>
                     </div>
-                    <div id="motion-status" class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                    <div class="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
-                        <span class="text-xs text-white">Motion: Idle</span>
+                        <span id="motion-indicator" class="text-xs text-white">Motion: Idle</span>
                     </div>
                 </div>
 
@@ -138,30 +212,17 @@
                         <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-primary rounded-br-lg"></div>
                     </div>
                 </div>
-
-                <div class="absolute top-20 right-4 flex flex-col gap-4">
-                    <button onclick="toggleCamera()" class="flex items-center justify-center rounded-full size-12 bg-black/40 text-white backdrop-blur-md border border-white/20">
-                        <span class="material-symbols-outlined">flip_camera_ios</span>
-                    </button>
-                </div>
             </div>
 
             <div class="absolute bottom-0 left-0 right-0 px-4 pb-4">
                 <div class="flex flex-col gap-4 rounded-xl border border-white/20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-5 shadow-2xl">
                     <div class="flex items-center justify-between">
-                        <span class="text-primary text-xs font-bold uppercase tracking-widest">Live Translation</span>
-                        <div class="flex items-center gap-2">
-                            <span class="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                            <span id="fps-counter" class="text-xs text-slate-500">30 FPS</span>
-                        </div>
+                        <span class="text-primary text-xs font-bold uppercase">Live Translation</span>
+                        <span id="fps-counter" class="text-xs text-slate-500">30 FPS</span>
                     </div>
                     <div class="flex flex-col gap-2 min-h-[80px]">
                         <p id="detected-sign" class="text-slate-900 dark:text-slate-100 text-3xl font-bold leading-tight">--</p>
                         <p id="gesture-desc" class="text-slate-500 text-sm">Show hand to camera</p>
-                        <div class="flex gap-4 mt-2">
-                            <span id="confidence" class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Confidence: --</span>
-                            <span id="motion-level" class="text-xs bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">Motion: --</span>
-                        </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <button onclick="speakText()" class="flex-1 flex items-center justify-center gap-2 rounded-lg h-14 bg-primary text-white text-lg font-bold shadow-lg">
@@ -176,36 +237,137 @@
             </div>
         </div>
 
-        <!-- SETTINGS & OTHER SCREENS -->
-        <div id="settings-screen" class="hidden flex-col h-full">
-            <div class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between border-b">
-                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2"><span class="material-symbols-outlined">arrow_back</span></button>
-                <h2 class="text-lg font-bold">Settings</h2>
+        <!-- LEARN ASL SCREEN -->
+        <div id="learn-screen" class="hidden flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">Learn ASL</h1>
                 <div class="w-10"></div>
             </div>
-            <div class="p-4 space-y-4 overflow-y-auto flex-1">
+            <div class="flex-1 p-4 overflow-y-auto">
+                <div class="grid grid-cols-3 gap-3" id="alphabet-grid"></div>
+            </div>
+            <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-6 pt-3">
+                <button onclick="showScreen('home')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">home</span>
+                    <p class="text-xs font-medium">Home</p>
+                </button>
+                <button onclick="showScreen('translate')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">translate</span>
+                    <p class="text-xs font-medium">Translate</p>
+                </button>
+                <button onclick="showScreen('learn')" class="flex flex-1 flex-col items-center justify-center gap-1 text-primary">
+                    <span class="material-symbols-outlined text-[28px] fill-1">school</span>
+                    <p class="text-xs font-medium">Learn</p>
+                </button>
+                <button onclick="showScreen('settings')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">settings</span>
+                    <p class="text-xs font-medium">Settings</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- HISTORY SCREEN -->
+        <div id="history-screen" class="hidden flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">Translation History</h1>
+                <button onclick="clearHistory()" class="text-red-500 p-2">
+                    <span class="material-symbols-outlined text-xl">delete</span>
+                </button>
+            </div>
+            <div class="flex-1 p-4 overflow-y-auto" id="history-list">
+                <p class="text-slate-500 text-center py-8">No translation history yet</p>
+            </div>
+            <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-6 pt-3">
+                <button onclick="showScreen('home')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">home</span>
+                    <p class="text-xs font-medium">Home</p>
+                </button>
+                <button onclick="showScreen('translate')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">translate</span>
+                    <p class="text-xs font-medium">Translate</p>
+                </button>
+                <button onclick="showScreen('learn')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">school</span>
+                    <p class="text-xs font-medium">Learn</p>
+                </button>
+                <button onclick="showScreen('settings')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">settings</span>
+                    <p class="text-xs font-medium">Settings</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- SETTINGS SCREEN -->
+        <div id="settings-screen" class="hidden flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">Settings</h1>
+                <div class="w-10"></div>
+            </div>
+            <div class="flex-1 p-4 space-y-4 overflow-y-auto">
                 <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                     <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">dark_mode</span><span class="font-semibold">Dark Mode</span></div>
                     <button onclick="toggleDarkMode()" class="w-12 h-6 bg-primary rounded-full relative"><div class="absolute left-7 top-1 bg-white w-4 h-4 rounded-full"></div></button>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                     <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">tune</span><span class="font-semibold">ML Sensitivity</span></div>
-                    <span class="text-primary font-bold">High</span>
+                    <select class="bg-transparent text-sm font-semibold">
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                     <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">speed</span><span class="font-semibold">Motion Tracking</span></div>
                     <span class="text-green-500 font-bold">Enabled</span>
                 </div>
+                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">notifications</span><span class="font-semibold">Notifications</span></div>
+                    <button class="w-12 h-6 bg-slate-300 dark:bg-slate-600 rounded-full relative"><div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full"></div></button>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">translate</span><span class="font-semibold">Language</span></div>
+                    <span class="text-slate-500">English (US)</span>
+                </div>
+            </div>
+            <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-6 pt-3">
+                <button onclick="showScreen('home')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">home</span>
+                    <p class="text-xs font-medium">Home</p>
+                </button>
+                <button onclick="showScreen('translate')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">translate</span>
+                    <p class="text-xs font-medium">Translate</p>
+                </button>
+                <button onclick="showScreen('learn')" class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500">
+                    <span class="material-symbols-outlined text-[28px]">school</span>
+                    <p class="text-xs font-medium">Learn</p>
+                </button>
+                <button onclick="showScreen('settings')" class="flex flex-1 flex-col items-center justify-center gap-1 text-primary">
+                    <span class="material-symbols-outlined text-[28px] fill-1">settings</span>
+                    <p class="text-xs font-medium">Settings</p>
+                </button>
             </div>
         </div>
 
+        <!-- VOICE SETTINGS SCREEN -->
         <div id="voice-settings-screen" class="hidden flex-col h-full">
-            <div class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between border-b">
-                <button onclick="showScreen('translate')" class="text-slate-700 p-2"><span class="material-symbols-outlined">arrow_back</span></button>
-                <h2 class="font-bold">Voice Settings</h2>
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('translate')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">Voice Settings</h1>
                 <div class="w-10"></div>
             </div>
-            <div class="p-4 space-y-6 flex-1 overflow-y-auto">
+            <div class="flex-1 p-4 space-y-6 overflow-y-auto">
                 <section>
                     <div class="flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-primary">record_voice_over</span><h3 class="font-bold">Voice Profile</h3></div>
                     <div class="flex h-12 rounded-xl bg-slate-100 dark:bg-slate-800 p-1.5">
@@ -214,16 +376,32 @@
                     </div>
                 </section>
                 <section>
-                    <div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">speed</span><h3 class="font-bold">Speech Speed</h3></div><span class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-lg">1.0x</span></div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">speed</span><h3 class="font-bold">Speech Speed</h3></div>
+                        <span class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-lg">1.0x</span>
+                    </div>
                     <div class="flex h-2 rounded-full bg-slate-200"><div class="h-full w-1/2 rounded-full bg-primary"></div></div>
                 </section>
+                <section>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">graphic_eq</span><h3 class="font-bold">Voice Pitch</h3></div>
+                        <span class="text-primary font-bold text-sm bg-primary/10 px-2 py-1 rounded-lg">Medium</span>
+                    </div>
+                    <div class="flex h-2 rounded-full bg-slate-200"><div class="h-full w-1/2 rounded-full bg-primary"></div></div>
+                </section>
+                <button onclick="testVoice()" class="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white font-bold rounded-xl">
+                    <span class="material-symbols-outlined">play_circle</span>Test Voice
+                </button>
             </div>
         </div>
 
+        <!-- CALIBRATE SCREEN -->
         <div id="calibrate-screen" class="hidden flex-col h-full">
-            <div class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between border-b">
-                <button onclick="showScreen('home')" class="text-slate-700 p-2"><span class="material-symbols-outlined">close</span></button>
-                <h2 class="font-bold">Calibration</h2>
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">Calibration</h1>
                 <button class="text-primary"><span class="material-symbols-outlined">help_outline</span></button>
             </div>
             <div class="px-6 py-4">
@@ -246,154 +424,94 @@
             </div>
         </div>
 
+        <!-- ABOUT SCREEN -->
+        <div id="about-screen" class="hidden flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+                <button onclick="showScreen('home')" class="text-slate-700 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 class="text-slate-900 dark:text-white text-lg font-bold">About</h1>
+                <div class="w-10"></div>
+            </div>
+            <div class="flex-1 p-4 overflow-y-auto space-y-6">
+                <div class="text-center py-8">
+                    <div class="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-4xl text-white">translate</span>
+                    </div>
+                    <h2 class="text-2xl font-bold">Sign Translator</h2>
+                    <p class="text-slate-500 mt-1">RAISE-26 Hackathon Project</p>
+                    <p class="text-sm text-primary font-semibold mt-2">Version 1.0.0</p>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                    <h3 class="font-bold mb-3">About This App</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Real-time American Sign Language (ASL) interpreter that uses AI and computer vision to translate sign language gestures into text and speech. Built for the RAISE-26 Hackathon.</p>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                    <h3 class="font-bold mb-3">Features</h3>
+                    <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-500">check_circle</span>Real-time ASL detection</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-500">check_circle</span>Motion tracking</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-500">check_circle</span>Text-to-speech</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-500">check_circle</span>Translation history</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-500">check_circle</span>Learn ASL alphabet</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                    <h3 class="font-bold mb-3">Technology</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">MediaPipe Holistic, TensorFlow.js, Tailwind CSS</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // ========== ENHANCED ASL RECOGNITION WITH MOTION DETECTION ==========
-        
-        const ASL_ALPHABET = {
-            "A": { desc: "Fist with thumb to the side", fingers: [0,0,0,0,1] },
-            "B": { desc: "Flat hand, fingers together", fingers: [1,1,1,1,0] },
-            "C": { desc: "Curved hand", fingers: [1,1,1,1,1] },
-            "D": { desc: "Index up, circle", fingers: [1,1,0,0,0] },
-            "E": { desc: "Bent fingers, thumb tucked", fingers: [0,0,0,0,0] },
-            "F": { desc: "OK sign", fingers: [1,1,1,1,1] },
-            "I": { desc: "Pinky up", fingers: [0,0,0,0,1] },
-            "L": { desc: "L shape", fingers: [1,1,0,0,0] },
-            "Y": { desc: "Hang loose", fingers: [1,0,0,0,1] },
-            "U": { desc: "Index + middle up", fingers: [1,1,1,0,0] },
-            "V": { desc: "Peace sign", fingers: [1,1,1,0,0] },
-            "W": { desc: "Three fingers up", fingers: [1,1,1,1,0] },
-            "Hello": { desc: "Hello greeting", fingers: null, motion: "wave" },
-            "Thank You": { desc: "Thank you", fingers: null, motion: "forward" },
-            "Yes": { desc: "Yes motion", fingers: null, motion: "up_down" },
-            "No": { desc: "No motion", fingers: null, motion: "side_side" }
-        };
+        // ASL Alphabet Data
+        const ASL_ALPHABET = [
+            { letter: "A", desc: "Fist with thumb to the side", fingers: "Thumb beside fist" },
+            { letter: "B", desc: "Flat hand, fingers together", fingers: "All fingers extended, thumb folded" },
+            { letter: "C", desc: "Curved hand like holding something", fingers: "Curved fingers and thumb" },
+            { letter: "D", desc: "Index up, others form circle", fingers: "Index up, thumb touches fingers" },
+            { letter: "E", desc: "Bent fingers, thumb tucked", fingers: "All fingers bent, thumb tucked" },
+            { letter: "F", desc: "OK sign", fingers: "Thumb and index touch, others up" },
+            { letter: "G", desc: "Index pointing sideways", fingers: "Index out, thumb extended" },
+            { letter: "H", desc: "Index and middle sideways", fingers: "Index and middle pointing" },
+            { letter: "I", desc: "Pinky up", fingers: "Only pinky extended" },
+            { letter: "J", desc: "I with motion", fingers: "Pinky moving in J shape" },
+            { letter: "K", desc: "Index + middle up, thumb between", fingers: "Two fingers up, thumb between" },
+            { letter: "L", desc: "L shape", fingers: "Thumb and index extended" },
+            { letter: "M", desc: "Three fingers over thumb", fingers: "Three fingers down over thumb" },
+            { letter: "N", desc: "Two fingers over thumb", fingers: "Two fingers down over thumb" },
+            { letter: "O", desc: "Fingers curved into O", fingers: "All fingers touching thumb" },
+            { letter: "P", desc: "K pointing down", fingers: "Like K pointing downward" },
+            { letter: "Q", desc: "G pointing down", fingers: "Like G pointing downward" },
+            { letter: "R", desc: "Crossed index and middle", fingers: "Two fingers crossed" },
+            { letter: "S", desc: "Thumb over fingers", fingers: "Fist with thumb over" },
+            { letter: "T", desc: "Thumb between index and middle", fingers: "Thumb between fingers" },
+            { letter: "U", desc: "Index + middle up together", fingers: "Two fingers straight up" },
+            { letter: "V", desc: "Peace sign", fingers: "Index and middle spread" },
+            { letter: "W", desc: "Three fingers up", fingers: "Three fingers extended" },
+            { letter: "X", desc: "Index bent like hook", fingers: "Index bent at joint" },
+            { letter: "Y", desc: "Thumb and pinky extended", fingers: "Hang loose sign" },
+            { letter: "Z", desc: "Z with finger drawing", fingers: "Index draws Z in air" }
+        ];
 
-        // State variables
         let currentSign = "--";
         let predictionHistory = [];
-        let motionHistory = [];
         let previousLandmarks = null;
         let cameraActive = false;
         let holistic = null;
-        let frameCount = 0;
-        let lastFPSUpdate = Date.now();
-        let fps = 0;
+        let translationCount = 0;
+        let sessionStartTime = Date.now();
+        let translationHistory = [];
 
-        // Motion tracking
-        const MotionTracker = {
-            velocities: [],
-            maxHistory: 10,
-            
-            calculateMotion(landmarks) {
-                if (!previousLandmarks || !landmarks) return 0;
-                
-                let totalMotion = 0;
-                for (let i = 0; i < Math.min(landmarks.length, previousLandmarks.length); i++) {
-                    const dx = landmarks[i].x - previousLandmarks[i].x;
-                    const dy = landmarks[i].y - previousLandmarks[i].y;
-                    const dz = landmarks[i].z - previousLandmarks[i].z;
-                    totalMotion += Math.sqrt(dx*dx + dy*dy + dz*dz);
-                }
-                
-                this.velocities.push(totalMotion);
-                if (this.velocities.length > this.maxHistory) this.velocities.shift();
-                
-                return totalMotion / (landmarks?.length || 1);
-            },
-            
-            getAverageMotion() {
-                if (this.velocities.length === 0) return 0;
-                return this.velocities.reduce((a, b) => a + b, 0) / this.velocities.length;
-            },
-            
-            getMotionState() {
-                const avg = this.getAverageMotion();
-                if (avg < 0.01) return "Idle";
-                if (avg < 0.03) return "Slow";
-                if (avg < 0.06) return "Moderate";
-                return "Fast";
-            }
-        };
-
-        // ========== HAND GESTURE RECOGNITION ==========
-        function getFingerStates(landmarks) {
-            if (!landmarks || landmarks.length < 21) return null;
-            
-            // More accurate finger detection
-            const thumbTip = landmarks[4];
-            const thumbIP = landmarks[3];
-            const thumbMCP = landmarks[2];
-            
-            const indexTip = landmarks[8];
-            const indexPIP = landmarks[6];
-            const indexMCP = landmarks[5];
-            
-            const middleTip = landmarks[12];
-            const middlePIP = landmarks[10];
-            const middleMCP = landmarks[9];
-            
-            const ringTip = landmarks[16];
-            const ringPIP = landmarks[14];
-            const ringMCP = landmarks[13];
-            
-            const pinkyTip = landmarks[20];
-            const pinkyPIP = landmarks[18];
-            const pinkyMCP = landmarks[17];
-            
-            // Detect extended fingers
-            const thumbExtended = Math.abs(thumbTip.x - thumbMCP.x) > Math.abs(thumbTip.y - thumbMCP.y);
-            const indexExtended = indexTip.y < indexPIP.y;
-            const middleExtended = middleTip.y < middlePIP.y;
-            const ringExtended = ringTip.y < ringPIP.y;
-            const pinkyExtended = pinkyTip.y < pinkyPIP.y;
-            
-            return {
-                thumb: thumbExtended ? 1 : 0,
-                index: indexExtended ? 1 : 0,
-                middle: middleExtended ? 1 : 0,
-                ring: ringExtended ? 1 : 0,
-                pinky: pinkyExtended ? 1 : 0,
-                raw: [thumbExtended?1:0, indexExtended?1:0, middleExtended?1:0, ringExtended?1:0, pinkyExtended?1:0]
-            };
+        // Menu functions
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            menu.classList.toggle('menu-slide');
+            menu.classList.toggle('menu-open');
         }
 
-        function detectASL(fingers, motion) {
-            if (!fingers) return null;
-            
-            const { thumb, index, middle, ring, pinky, raw } = fingers;
-            const count = thumb + index + middle + ring + pinky;
-            
-            // Static gesture recognition
-            if (count === 0) return { letter: "E", desc: ASL_ALPHABET["E"].desc, confidence: 92 };
-            if (count === 1 && index) return { letter: "I", desc: ASL_ALPHABET["I"].desc, confidence: 94 };
-            if (count === 2 && index && middle && !ring && !pinky) return { letter: "U", desc: ASL_ALPHABET["U"].desc, confidence: 90 };
-            if (count === 3 && index && middle && ring && !pinky) return { letter: "W", desc: ASL_ALPHABET["W"].desc, confidence: 88 };
-            if (count === 4) return { letter: "B", desc: ASL_ALPHABET["B"].desc, confidence: 91 };
-            if (count === 5) return { letter: "Five", desc: "Five fingers", confidence: 85 };
-            
-            // L shape - thumb and index
-            if (thumb && index && !middle && !ring && !pinky) return { letter: "L", desc: ASL_ALPHABET["L"].desc, confidence: 95 };
-            
-            // Y shape - thumb and pinky
-            if (thumb && !index && !middle && !ring && pinky) return { letter: "Y", desc: ASL_ALPHABET["Y"].desc, confidence: 93 };
-            
-            // V or Peace
-            if (index && middle && !ring && !pinky && Math.abs(index.x - middle.x) > 0.05) {
-                return { letter: "V", desc: ASL_ALPHABET["V"].desc, confidence: 89 };
-            }
-            
-            // D shape - index up, others form circle
-            if (index && !middle && !ring && !pinky) {
-                // Check if thumb touches other fingers
-                return { letter: "D", desc: ASL_ALPHABET["D"].desc, confidence: 82 };
-            }
-            
-            return { letter: `Fingers: ${count}`, desc: `${count} fingers`, confidence: 70 + (10 - Math.abs(count - 3)) * 3 };
-        }
-
-        // ========== UI FUNCTIONS ==========
         function showScreen(screenName) {
             document.querySelectorAll('[id$="-screen"]').forEach(s => {
                 s.classList.add('hidden');
@@ -405,23 +523,64 @@
                 screen.classList.remove('hidden');
                 screen.classList.add('flex');
             }
-            
+
             if (screenName === 'translate') startMLCamera();
-            if (screenName === 'calibrate') startCalibrationCamera();
-            if (screenName === 'home') stopCamera();
+            else if (screenName === 'calibrate') startMLCamera();
+            else if (screenName === 'home') stopCamera();
+            else if (screenName === 'learn') renderAlphabet();
+            else if (screenName === 'history') renderHistory();
+            
+            // Close menu if open
+            document.getElementById('side-menu').classList.add('menu-slide');
+            document.getElementById('side-menu').classList.remove('menu-open');
+        }
+
+        function renderAlphabet() {
+            const grid = document.getElementById('alphabet-grid');
+            grid.innerHTML = ASL_ALPHABET.map(sign => `
+                <button onclick="showLetter('${sign.letter}')" class="flex flex-col items-center justify-center p-4 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-primary/10 transition-colors">
+                    <span class="text-2xl font-bold text-primary">${sign.letter}</span>
+                    <span class="text-xs text-slate-500 mt-1">${sign.desc}</span>
+                </button>
+            `).join('');
+        }
+
+        function showLetter(letter) {
+            const sign = ASL_ALPHABET.find(s => s.letter === letter);
+            if (sign) {
+                alert(`${letter}: ${sign.desc}\n\nFingers: ${sign.fingers}`);
+            }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if (translationHistory.length === 0) {
+                list.innerHTML = '<p class="text-slate-500 text-center py-8">No translation history yet</p>';
+            } else {
+                list.innerHTML = translationHistory.map((t, i) => `
+                    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                        <div>
+                            <span class="text-xl font-bold text-primary">${t.letter}</span>
+                            <p class="text-sm text-slate-500">${t.desc}</p>
+                        </div>
+                        <span class="text-xs text-slate-400">${t.time}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function clearHistory() {
+            translationHistory = [];
+            renderHistory();
         }
 
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
-            const icon = document.getElementById('theme-icon');
-            icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
         }
 
-        // ========== ML CAMERA ==========
-        async function startMLCamera() {
+        // ML Functions
+        function startMLCamera() {
             if (cameraActive) return;
-            
-            updateLoadingStatus(20, 'Loading MediaPipe Holistic...');
             
             const video = document.getElementById('inputVideo');
             const canvas = document.getElementById('outputCanvas');
@@ -430,8 +589,6 @@
             const ctx = canvas.getContext('2d');
             cameraActive = true;
 
-            updateLoadingStatus(40, 'Initializing ML models...');
-
             holistic = new Holistic({
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1675469240/${file}`
             });
@@ -439,95 +596,52 @@
             holistic.setOptions({
                 modelComplexity: 1,
                 smoothLandmarks: true,
-                enableSegmentation: false,
-                smoothSegmentation: false,
-                refineFaceLandmarks: true,
                 minDetectionConfidence: 0.5,
                 minTrackingConfidence: 0.5
             });
 
             holistic.onResults((results) => {
-                frameCount++;
-                const now = Date.now();
-                if (now - lastFPSUpdate > 1000) {
-                    fps = frameCount;
-                    frameCount = 0;
-                    lastFPSUpdate = now;
-                    document.getElementById('fps-counter').textContent = `${fps} FPS`;
-                }
-
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
-                // Process hand landmarks
-                if (results.leftHandLandmarks || results.rightHandLandmarks) {
+                if (results.rightHandLandmarks || results.leftHandLandmarks) {
                     const landmarks = results.rightHandLandmarks || results.leftHandLandmarks;
                     
-                    // Calculate motion
-                    const motion = MotionTracker.calculateMotion(landmarks);
-                    const motionState = MotionTracker.getMotionState();
-                    
-                    // Update UI
-                    document.getElementById('motion-level').textContent = `Motion: ${motionState}`;
-                    
-                    // Draw landmarks
                     if (results.rightHandLandmarks) {
                         drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#135bec', lineWidth: 2});
                         drawLandmarks(ctx, results.rightHandLandmarks, {color: '#ff4757', lineWidth: 1});
                     }
-                    if (results.leftHandLandmarks) {
-                        drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#00ff88', lineWidth: 2});
-                        drawLandmarks(ctx, results.leftHandLandmarks, {color: '#ffaa00', lineWidth: 1});
-                    }
 
-                    // Gesture recognition
                     const fingers = getFingerStates(landmarks);
-                    const detected = detectASL(fingers, motion);
+                    const detected = detectASL(fingers);
                     
                     if (detected) {
                         predictionHistory.push(detected.letter);
-                        if (predictionHistory.length > 8) predictionHistory.shift();
+                        if (predictionHistory.length > 6) predictionHistory.shift();
                         
-                        // Only update if consistent prediction
-                        const recent = predictionHistory.slice(-4);
-                        if (recent.length >= 3 && new Set(recent).size === 1) {
+                        const recent = predictionHistory.slice(-3);
+                        if (recent.length >= 2 && new Set(recent).size === 1) {
                             currentSign = detected.letter;
                             updateTranslation(detected);
                         }
                     }
-                    
-                    previousLandmarks = landmarks.map(l => ({...l}));
                 } else {
-                    previousLandmarks = null;
-                    predictionHistory = [];
                     currentSign = "--";
                     document.getElementById('detected-sign').textContent = "--";
                     document.getElementById('gesture-desc').textContent = "Show hand to camera";
+                    predictionHistory = [];
                 }
-
                 ctx.restore();
             });
 
-            updateLoadingStatus(60, 'Starting camera...');
-
             const camera = new Camera(video, {
-                onFrame: async () => {
-                    await holistic.send({image: video});
-                },
-                width: 1280,
-                height: 720
+                onFrame: async () => { await holistic.send({image: video}); },
+                width: 1280, height: 720
             });
-            
             camera.start();
-            updateLoadingStatus(100, 'Ready!');
-            setTimeout(() => showScreen('translate'), 500);
-        }
-
-        function startCalibrationCamera() {
-            startMLCamera();
         }
 
         function stopCamera() {
@@ -537,37 +651,58 @@
             });
         }
 
+        function getFingerStates(landmarks) {
+            if (!landmarks || landmarks.length < 21) return null;
+            const thumbExtended = landmarks[4].x < landmarks[3].x || landmarks[4].x > landmarks[3].x;
+            return {
+                thumb: thumbExtended ? 1 : 0,
+                index: landmarks[8].y < landmarks[6].y ? 1 : 0,
+                middle: landmarks[12].y < landmarks[10].y ? 1 : 0,
+                ring: landmarks[16].y < landmarks[14].y ? 1 : 0,
+                pinky: landmarks[20].y < landmarks[18].y ? 1 : 0,
+            };
+        }
+
+        function detectASL(fingers) {
+            if (!fingers) return null;
+            const { thumb, index, middle, ring, pinky } = fingers;
+            const count = thumb + index + middle + ring + pinky;
+            
+            if (count === 0) return { letter: "E", desc: "Bent fingers" };
+            if (count === 1 && index) return { letter: "I", desc: "Pinky up" };
+            if (count === 2 && index && middle) return { letter: "U", desc: "Two fingers up" };
+            if (count === 3 && index && middle && ring) return { letter: "W", desc: "Three fingers" };
+            if (count === 4) return { letter: "B", desc: "Four fingers" };
+            if (count === 5) return { letter: "Five", desc: "Five fingers" };
+            if (thumb && index && !middle && !ring && !pinky) return { letter: "L", desc: "L shape" };
+            if (thumb && !index && !middle && !ring && pinky) return { letter: "Y", desc: "Hang loose" };
+            if (index && middle && !ring && !pinky) return { letter: "V", desc: "Peace sign" };
+            
+            return { letter: `Fingers: ${count}`, desc: `${count} fingers` };
+        }
+
         function updateTranslation(detected) {
             document.getElementById('detected-sign').textContent = detected.letter;
             document.getElementById('gesture-desc').textContent = detected.desc;
-            document.getElementById('confidence').textContent = `Confidence: ${detected.confidence}%`;
+            
+            translationCount++;
+            document.getElementById('stat-translations').textContent = translationCount;
+            
+            const timeElapsed = Math.floor((Date.now() - sessionStartTime) / 60000);
+            document.getElementById('stat-time').textContent = timeElapsed + 'm';
             
             // Add to history
-            const history = document.getElementById('translation-history');
-            if (history && detected.confidence > 75) {
-                const item = document.createElement('div');
-                item.className = 'glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-700';
-                item.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold text-primary uppercase">${detected.letter}</span>
-                        <span class="text-xs text-slate-500">${detected.confidence}%</span>
-                    </div>
-                    <p class="text-slate-700 dark:text-slate-300 text-sm mt-1">${detected.desc}</p>
-                `;
-                history.insertBefore(item, history.firstChild);
-                if (history.children.length > 10) history.lastChild.remove();
-            }
-        }
-
-        function updateLoadingStatus(percent, text) {
-            document.getElementById('loading-progress').style.width = percent + '%';
-            document.getElementById('loading-status').textContent = text;
+            translationHistory.unshift({
+                letter: detected.letter,
+                desc: detected.desc,
+                time: new Date().toLocaleTimeString()
+            });
+            if (translationHistory.length > 20) translationHistory.pop();
         }
 
         function speakText() {
             if (currentSign !== "--") {
-                const utterance = new SpeechSynthesisUtterance(currentSign);
-                speechSynthesis.speak(utterance);
+                speechSynthesis.speak(new SpeechSynthesisUtterance(currentSign));
             }
         }
 
@@ -575,21 +710,17 @@
             if (currentSign !== "--") navigator.clipboard.writeText(currentSign);
         }
 
+        function testVoice() {
+            speechSynthesis.speak(new SpeechSynthesisUtterance("Hello! This is a test of the voice settings."));
+        }
+
         function startCalibration() {
             showScreen('calibrate');
         }
 
-        function toggleCamera() {
-            if (cameraActive) stopCamera();
-            else startMLCamera();
-        }
-
         // Initialize
         window.addEventListener('load', () => {
-            updateLoadingStatus(10, 'Starting...');
-            setTimeout(() => {
-                showScreen('home');
-            }, 1500);
+            setTimeout(() => showScreen('home'), 1500);
         });
     </script>
 </body>
