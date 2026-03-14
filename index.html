@@ -1133,21 +1133,9 @@
             volume: 1
         };
 
-        // Wait for MediaPipe to load - faster timeout
-        function waitForMediaPipe(callback, retries = 10) {
-            if (typeof Holistic !== 'undefined' && typeof Camera !== 'undefined') {
-                callback();
-            } else if (retries > 0) {
-                setTimeout(() => waitForMediaPipe(callback, retries - 1), 100);
-            } else {
-                console.error('MediaPipe failed to load');
-                document.getElementById('loading-status').textContent = 'Error loading ML models. Please refresh.';
-            }
-        }
-        
-        // Preload MediaPipe in background
-        function preloadMediaPipe() {
-            document.getElementById('loading-status').textContent = 'Loading camera...';
+        // Check if MediaPipe is ready
+        function checkMediaPipe() {
+            return typeof Holistic !== 'undefined' && typeof Camera !== 'undefined';
         }
 
         // Calibration state
@@ -1506,9 +1494,19 @@
         function startMLCamera() {
             if (cameraActive) return;
             
-            waitForMediaPipe(function() {
-                initMLCamera();
-            });
+            // Simple poll for MediaPipe
+            let attempts = 0;
+            function tryInit() {
+                if (checkMediaPipe()) {
+                    initMLCamera();
+                } else if (attempts < 30) {
+                    attempts++;
+                    setTimeout(tryInit, 100);
+                } else {
+                    initMLCamera(); // Fallback
+                }
+            }
+            tryInit();
         }
 
         function initMLCamera() {
@@ -1913,9 +1911,19 @@
             calibrationStep = 0;
             updateCalibrationUI();
             
-            waitForMediaPipe(function() {
-                initCalibrationCamera();
-            });
+            // Simple poll for MediaPipe
+            let attempts = 0;
+            function tryInit() {
+                if (checkMediaPipe()) {
+                    initCalibrationCamera();
+                } else if (attempts < 30) {
+                    attempts++;
+                    setTimeout(tryInit, 100);
+                } else {
+                    initCalibrationCamera();
+                }
+            }
+            tryInit();
         }
 
         function initCalibrationCamera() {
@@ -1956,7 +1964,6 @@
                 width: 640, height: 480
             });
             camera.start();
-            });
         }
 
         function updateCalibrationUI() {
@@ -2016,9 +2023,18 @@
         function startFaceCamera() {
             if (faceCameraActive) return;
             
-            waitForMediaPipe(function() {
-                initFaceCamera();
-            });
+            let attempts = 0;
+            function tryInit() {
+                if (checkMediaPipe()) {
+                    initFaceCamera();
+                } else if (attempts < 30) {
+                    attempts++;
+                    setTimeout(tryInit, 100);
+                } else {
+                    initFaceCamera();
+                }
+            }
+            tryInit();
         }
 
         function initFaceCamera() {
@@ -2081,7 +2097,6 @@
                 width: 1280, height: 720
             });
             camera.start();
-            });
         }
 
         function stopFaceCamera() {
