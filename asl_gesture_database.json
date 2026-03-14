@@ -1,0 +1,257 @@
+{
+  "version": "1.0",
+  "description": "American Sign Language (ASL) Gesture Database with Hand Landmarks",
+  "alphabet": {
+    "A": {
+      "description": "Fist with thumb to the side",
+      "finger_states": [0, 0, 0, 0, 1],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "B": {
+      "description": "Flat hand, fingers together, thumb folded",
+      "finger_states": [1, 1, 1, 1, 0],
+      "thumb_position": "folded",
+      "difficulty": "easy"
+    },
+    "C": {
+      "description": "Curved hand like holding something",
+      "finger_states": [1, 1, 1, 1, 1],
+      "thumb_position": "curved",
+      "difficulty": "medium"
+    },
+    "D": {
+      "description": "Index finger up, other fingers form circle",
+      "finger_states": [1, 1, 0, 0, 0],
+      "thumb_position": "touching_index",
+      "difficulty": "medium"
+    },
+    "E": {
+      "description": "Bent fingers, thumb tucked",
+      "finger_states": [0, 0, 0, 0, 0],
+      "thumb_position": "tucked",
+      "difficulty": "easy"
+    },
+    "F": {
+      "description": "OK sign but with index and thumb touching",
+      "finger_states": [1, 1, 1, 1, 1],
+      "thumb_position": "touching_index",
+      "difficulty": "medium"
+    },
+    "G": {
+      "description": "Index pointing sideways, thumb out",
+      "finger_states": [1, 1, 0, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "medium"
+    },
+    "H": {
+      "description": "Index and middle finger pointing sideways",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "medium"
+    },
+    "I": {
+      "description": "Pinky finger up only",
+      "finger_states": [0, 0, 0, 0, 1],
+      "thumb_position": "folded",
+      "difficulty": "easy"
+    },
+    "J": {
+      "description": "I with a motion",
+      "finger_states": [0, 0, 0, 0, 1],
+      "thumb_position": "folded",
+      "difficulty": "medium"
+    },
+    "K": {
+      "description": "Index and middle up, thumb between",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "between",
+      "difficulty": "hard"
+    },
+    "L": {
+      "description": "L shape with thumb and index",
+      "finger_states": [1, 1, 0, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "M": {
+      "description": "Three fingers over thumb",
+      "finger_states": [0, 1, 1, 1, 0],
+      "thumb_position": "under",
+      "difficulty": "medium"
+    },
+    "N": {
+      "description": "Two fingers over thumb",
+      "finger_states": [0, 0, 1, 1, 0],
+      "thumb_position": "under",
+      "difficulty": "medium"
+    },
+    "O": {
+      "description": "Fingers curved into O shape",
+      "finger_states": [1, 1, 1, 1, 1],
+      "thumb_position": "touching_index",
+      "difficulty": "easy"
+    },
+    "P": {
+      "description": "K pointing down",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "between",
+      "difficulty": "hard"
+    },
+    "Q": {
+      "description": "G pointing down",
+      "finger_states": [1, 1, 0, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "hard"
+    },
+    "R": {
+      "description": "Crossed index and middle fingers",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "over",
+      "difficulty": "medium"
+    },
+    "S": {
+      "description": "Fist with thumb over fingers",
+      "finger_states": [0, 0, 0, 0, 0],
+      "thumb_position": "over",
+      "difficulty": "easy"
+    },
+    "T": {
+      "description": "Fist with thumb between index and middle",
+      "finger_states": [0, 1, 0, 0, 0],
+      "thumb_position": "between",
+      "difficulty": "medium"
+    },
+    "U": {
+      "description": "Index and middle up together",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "V": {
+      "description": "Peace sign (index and middle spread)",
+      "finger_states": [1, 1, 1, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "W": {
+      "description": "Three fingers up (index, middle, ring)",
+      "finger_states": [1, 1, 1, 1, 0],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "X": {
+      "description": "Index bent like hook",
+      "finger_states": [1, 0, 0, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "hard"
+    },
+    "Y": {
+      "description": "Thumb and pinky extended (hang loose)",
+      "finger_states": [1, 0, 0, 0, 1],
+      "thumb_position": "side",
+      "difficulty": "easy"
+    },
+    "Z": {
+      "description": "Z with finger drawing",
+      "finger_states": [1, 1, 0, 0, 0],
+      "thumb_position": "side",
+      "difficulty": "hard"
+    }
+  },
+  "phrases": {
+    "HELLO": {
+      "description": "Wave or fingertips to chin then away",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "THANK_YOU": {
+      "description": "Flat hand from chin to forward",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "YES": {
+      "description": "Fist moving up and down",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "NO": {
+      "description": "Index finger shaking side to side",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "PLEASE": {
+      "description": "Flat hand rubbing in circle on chest",
+      "gesture_type": "dynamic",
+      "difficulty": "medium"
+    },
+    "SORRY": {
+      "description": "Fist rubbing in circle on chest",
+      "gesture_type": "dynamic",
+      "difficulty": "medium"
+    },
+    "HELP": {
+      "description": "Open hand flat upward",
+      "gesture_type": "static",
+      "difficulty": "easy"
+    },
+    "I_LOVE_YOU": {
+      "description": "Thumb, index, pinky extended (I love you sign)",
+      "gesture_type": "static",
+      "difficulty": "easy"
+    },
+    "GOOD": {
+      "description": "Thumb up",
+      "gesture_type": "static",
+      "difficulty": "easy"
+    },
+    "BAD": {
+      "description": "Thumb down",
+      "gesture_type": "static",
+      "difficulty": "easy"
+    },
+    "MORE": {
+      "description": "Both hands fingertips touching, then apart",
+      "gesture_type": "dynamic",
+      "difficulty": "medium"
+    },
+    "EAT": {
+      "description": "Fingers to mouth like eating",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "DRINK": {
+      "description": "Fist to mouth like holding cup",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "GO": {
+      "description": "Flat hand moving forward",
+      "gesture_type": "dynamic",
+      "difficulty": "easy"
+    },
+    "STOP": {
+      "description": "Open hand facing forward",
+      "gesture_type": "static",
+      "difficulty": "easy"
+    }
+  },
+  "finger_states_guide": {
+    "0": "folded",
+    "1": "extended"
+  },
+  "finger_mapping": {
+    "0": "thumb",
+    "1": "index",
+    "2": "middle",
+    "3": "ring",
+    "4": "pinky"
+  },
+  "metadata": {
+    "total_gestures": 41,
+    "alphabet_count": 26,
+    "phrases_count": 15,
+    "created_for": "RAISE-26 Hackathon",
+    "project_id": "1559029"
+  }
+}

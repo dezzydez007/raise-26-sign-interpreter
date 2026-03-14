@@ -1,0 +1,14 @@
+Supabase: https://supabase.com/dashboard/project/pagufhklqtkxtrmspvpg
+Project URL: https://pagufhklqtkxtrmspvpg.supabase.co
+
+Publishable Key:  sb_publishable_g_dRjO1___TSjk61w3rquA_Jwg8pkij
+
+Anon Key (Legacy):  
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhZ3VmaGtscXRreHRybXNwdnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDc1MjMsImV4cCI6MjA4ODcyMzUyM30.81FXOJmOEWSEMnxKMhmBFCwdWjEHPxFjC8fkh6Kuh4Y
+
+
+
+https://vercel.com
+
+User ID: rb1kDiWuqpf4u1gNYvJK3ug1
+
